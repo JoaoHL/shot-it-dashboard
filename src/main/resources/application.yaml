@@ -1,0 +1,38 @@
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  application:
+    name: "ShotIt"
+
+  servlet:
+    multipart:
+      max-file-size: "100MB"
+      max-request-size: "100MB"
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/captureit?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&useSSL=false}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:verysecret}
+
+  jpa:
+    hibernate:
+      ddl-auto: "update"
+    properties:
+      hibernate:
+        dialect: "org.hibernate.dialect.MySQL8Dialect"
+
+jwt:
+  secret: "S3CR3T"
+
+storage:
+  local: "storage/videos"
+
+aws:
+  accessKey: "local"
+  secretKey: "stack"
+  region: "us-east-1"
+  url: "http://localhost:9999"
