@@ -1,26 +1,16 @@
 package br.com.acgj.shotit
 
-import org.springframework.amqp.core.AmqpTemplate
-import org.springframework.amqp.core.Queue
-import org.springframework.amqp.rabbit.annotation.RabbitListener
-import org.springframework.boot.ApplicationArguments
-import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.context.annotation.Bean
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 
 @SpringBootApplication
-class ShotitApplication {
+class ShotitApplication : WebMvcConfigurer{
 
-	@Bean
-	fun runner(template: AmqpTemplate): ApplicationRunner {
-		return ApplicationRunner { args: ApplicationArguments? -> template.convertAndSend("myqueue", "foo") }
-	}
-
-	@Bean
-	fun myQueue(): Queue {
-		return Queue("myqueue")
+	override fun addCorsMappings(registry: CorsRegistry) {
+		registry.addMapping("/**").allowedMethods("*").allowedOrigins("*")
 	}
 }
 

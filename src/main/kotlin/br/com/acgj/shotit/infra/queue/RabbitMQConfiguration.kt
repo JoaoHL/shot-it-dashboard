@@ -9,21 +9,35 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class RabbitMQConfiguration {
 
-    @Bean
-    fun userExchange(): Exchange = TopicExchange("user.exchange")
-
-    @Bean
-    fun userQueue(): Queue = Queue("user.queue")
-
-    @Bean
-    fun userBinding(userQueue: Queue, userExchange: Exchange ): Binding {
-        val binding = BindingBuilder
-            .bind(userQueue)
-            .to(userExchange as TopicExchange)
-            .with("user.created")
-
-        return binding
+    companion object {
+        const val EXCHANGE_NAME = "video.event"
+        const val UPLOAD_QUEUE = "video.processed"
+        const val UPLOAD_ROUTING_KEY = "video.upload"
+        const val THUMBNAIL_QUEUE = "video.thumbnail"
+        const val THUMBNAIL_ROUTING_KEY = "thumbnail.generated"
     }
+
+    @Bean
+    fun videoExchange(): Exchange = TopicExchange(EXCHANGE_NAME)
+
+    @Bean
+    fun videoUploadQueue(): Queue = Queue(UPLOAD_QUEUE)
+
+    @Bean
+    fun videoThumbnailQueue(): Queue = Queue(THUMBNAIL_QUEUE)
+
+    @Bean
+    fun videoUploadBinding(videoUploadQueue: Queue, videoExchange: Exchange): Binding =
+        BindingBuilder
+            .bind(videoUploadQueue)
+            .to(videoExchange as TopicExchange)
+            .with(UPLOAD_ROUTING_KEY)
+
+    @Bean
+    fun videoThumbnailProcessed(videoThumbnailQueue: Queue, videoExchange: Exchange): Binding = BindingBuilder
+        .bind(videoThumbnailQueue)
+        .to(videoExchange as TopicExchange)
+        .with(THUMBNAIL_ROUTING_KEY)
 
     @Bean
     fun messageConverter(): MessageConverter = Jackson2JsonMessageConverter()

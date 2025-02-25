@@ -28,7 +28,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-amqp")
 
 	implementation("com.rabbitmq:amqp-client:5.24.0")
-	implementation("software.amazon.awssdk:s3:2.30.23")
+	implementation("aws.sdk.kotlin:s3:1.4.27")
 	implementation("com.auth0:java-jwt:4.5.0")
 
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")

@@ -24,7 +24,7 @@ data class User(
     var password: String,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val videos: Set<Video> = setOf()
+    val videos: MutableList<Video>? = null
 )
 
 @Entity
@@ -39,6 +39,9 @@ data class Video(
     @ManyToOne @JoinColumn(name = "user_id")
     var user: User? = null,
 
+    @OneToMany(mappedBy = "video", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, targetEntity = Thumbnail::class)
+    var thumbnails: MutableList<Thumbnail>? = null,
+
     @Enumerated(STRING)
     var status: VideoStatus = VideoStatus.PENDING,
 
@@ -47,10 +50,21 @@ data class Video(
     var url: String? = null,
 
     @Transient
-    var file: MultipartFile? = null,
+    var file: MultipartFile? = null
+)
 
-    @Column(name = "thumbnail_url")
-    var thumbnailUrl: String? = null,
+@Entity
+@Table(name = "thumbnails")
+data class Thumbnail(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
+
+    @ManyToOne @JoinColumn(name = "video_id")
+    var video: Video? = null,
+
+    var url: String,
+
+    var principal: Boolean = false
 )
 
 enum class VideoStatus {

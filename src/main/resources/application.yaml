@@ -35,4 +35,4 @@ aws:
   accessKey: "local"
   secretKey: "stack"
   region: "us-east-1"
-  url: "http://localhost:9999"
+  url: "http://localhost:4566"

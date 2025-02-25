@@ -4,6 +4,7 @@ import br.com.acgj.shotit.domain.Video
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ResourceLoader
+import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
@@ -15,7 +16,7 @@ class LocalUploadVideoGateway(
     private val folderName: String
 ) : UploadGateway {
 
-    override fun upload(video: Video): String {
+    override suspend fun upload(video: Video): String {
         val resource = Paths.get(folderName)
 
         if (!Files.exists(resource)){
@@ -35,5 +36,7 @@ class LocalUploadVideoGateway(
         return path.toString()
     }
 
-
+    override suspend fun retrieve(key: String): ByteArrayOutputStream {
+        TODO("Not yet implemented")
+    }
 }

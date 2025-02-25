@@ -1,6 +1,7 @@
 package br.com.acgj.shotit.infra.configuration
 
-import br.com.acgj.shotit.infra.upload.LocalUploadVideoGateway
+import aws.sdk.kotlin.services.s3.S3Client
+import br.com.acgj.shotit.infra.upload.S3UploadGateway
 import br.com.acgj.shotit.infra.upload.UploadGateway
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -14,6 +15,6 @@ class ShotItConfiguration {
     fun uploadGateway(
         loader: ResourceLoader,
         @Value("\${storage.local}") folderName: String
-    ): UploadGateway = LocalUploadVideoGateway(loader = loader, folderName = folderName)
+    ): UploadGateway = S3UploadGateway(client = S3Client {})
 
 }
