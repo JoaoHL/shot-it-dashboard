@@ -22,7 +22,7 @@ class AuthenticationController(private val service: AuthenticationService) {
     }
 
     @PostMapping("/sign-up")
-    fun handleSignUp(@RequestBody request: SignUpRequest): ResponseEntity<Any>{
+    fun handleSignUp(request: SignUpRequest): ResponseEntity<Any>{
         service.register(request)
         return ResponseEntity.ok().build()
     }

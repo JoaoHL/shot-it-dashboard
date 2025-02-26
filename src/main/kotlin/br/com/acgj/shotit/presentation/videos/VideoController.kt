@@ -5,6 +5,7 @@ import br.com.acgj.shotit.domain.BadRequestError
 import br.com.acgj.shotit.domain.NotFoundError
 import br.com.acgj.shotit.infra.security.ApplicationUser
 import br.com.acgj.shotit.presentation.videos.edit.EditVideoService
+import br.com.acgj.shotit.presentation.videos.edit.UpdateVideoTags
 import br.com.acgj.shotit.presentation.videos.edit.UpdateVideoTitleRequest
 import br.com.acgj.shotit.presentation.videos.retrieve.RetrieveVideoService
 import br.com.acgj.shotit.presentation.videos.retrieve.VideoDTO
@@ -67,6 +68,10 @@ class VideoController(
         return ResponseEntity.ok().build<Any>()
     }
 
+    @PatchMapping("/{id}/tags")
+    fun handleChangeVideoTags(@PathVariable("id") id: Long, @RequestBody request: UpdateVideoTags): ResponseEntity<Any> {
+        editVideoService.updateVideoTags(id, request.tagIds)
 
-
+        return ResponseEntity.ok().build()
+    }
 }

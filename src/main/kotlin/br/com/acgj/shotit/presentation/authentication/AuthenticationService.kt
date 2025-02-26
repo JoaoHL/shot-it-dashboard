@@ -5,7 +5,9 @@ import br.com.acgj.shotit.domain.NotFoundError
 import br.com.acgj.shotit.infra.UserRepository
 import br.com.acgj.shotit.infra.jwt.JWTService
 import br.com.acgj.shotit.infra.security.UserDetailsImpl
+import br.com.acgj.shotit.infra.upload.S3AvatarUploadGateway
 import jakarta.transaction.Transactional
+import kotlinx.coroutines.runBlocking
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.AuthenticationException
@@ -16,16 +18,19 @@ import org.springframework.stereotype.Service
 class AuthenticationService(
     private val manager: AuthenticationManager,
     private val userRepository: UserRepository,
+    private val uploadService: S3AvatarUploadGateway,
     private val passwordEncoder: PasswordEncoder,
-    private val producer: AuthenticationProducer,
     private val jwtService: JWTService
 ) {
 
     @Transactional
     fun register(request: SignUpRequest){
         val user = request.toUser(passwordEncoder)
-        val created = userRepository.save(user)
-        producer.sendCreateUserEvent(created)
+        val url = runBlocking { uploadService.upload(request.username, request.picture) }
+
+        user.profilePicture = url
+
+        userRepository.save(user)
     }
 
     fun authenticate(request: SignInRequest): String {

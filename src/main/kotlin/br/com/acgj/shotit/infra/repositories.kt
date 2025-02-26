@@ -1,9 +1,11 @@
 package br.com.acgj.shotit.infra
 
+import br.com.acgj.shotit.domain.VideoCategoryTag
 import br.com.acgj.shotit.domain.Thumbnail
 import br.com.acgj.shotit.domain.User
 import br.com.acgj.shotit.domain.Video
 import jakarta.transaction.Transactional
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -17,11 +19,16 @@ interface UserRepository : JpaRepository<User, Long> {
 
 @Repository
 interface VideoRepository : JpaRepository<Video, Long> {
+
     @Query("FROM Video v JOIN FETCH v.thumbnails WHERE v.id = :id")
     fun eagerFindById(id: Long): Optional<Video>
 
-    @Query("FROM Video v JOIN FETCH v.thumbnails WHERE v.user = :user")
+    @EntityGraph(attributePaths = ["thumbnails"])
+    @Query("FROM Video v WHERE v.user = :user")
     fun findByUser(user: User): MutableList<Video>
+
+    @Query("SELECT tag FROM VideoCategoryTag tag JOIN tag.video v WHERE v = :video")
+    fun retrieveForVideo(video: Video): MutableList<VideoCategoryTag>
 
     @Modifying
     @Transactional
@@ -31,3 +38,8 @@ interface VideoRepository : JpaRepository<Video, Long> {
 
 @Repository
 interface ThumbnailRepository : JpaRepository<Thumbnail, Long>
+
+@Repository
+interface VideoCategoryTagRepository: JpaRepository<VideoCategoryTag, Long> {
+
+}

@@ -10,11 +10,11 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.*
 
-class LocalUploadVideoGateway(
+class LocalVideoUploadVideoGateway(
     private val logger: Logger = LoggerFactory.getLogger("LocalUploader"),
     private val loader: ResourceLoader,
     private val folderName: String
-) : UploadGateway {
+) : VideoUploadGateway {
 
     override suspend fun upload(video: Video): String {
         val resource = Paths.get(folderName)

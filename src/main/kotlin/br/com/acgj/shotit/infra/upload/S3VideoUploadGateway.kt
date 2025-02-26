@@ -13,10 +13,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 
-class S3UploadGateway(
+class S3VideoUploadGateway(
     private val client: S3Client,
     private val logger: Logger = LoggerFactory.getLogger("S3Uploader")
-) : UploadGateway {
+) : VideoUploadGateway {
 
     private final val BUCKET: String = "shotit"
 
@@ -32,15 +32,7 @@ class S3UploadGateway(
             contentEncoding = "UTF-8"
         }
 
-        S3Client {
-            region = "us-east-1"
-            endpointUrl = Url.parse("http://localhost:4566")
-            forcePathStyle = true
-            credentialsProvider = StaticCredentialsProvider {
-                accessKeyId = "local"
-                secretAccessKey = "stack"
-            }
-        }.use {
+       client.use {
             run {
                 try {
                     it.putObject(request)

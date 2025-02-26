@@ -1,6 +1,7 @@
 package br.com.acgj.shotit.presentation.videos.retrieve
 
 import br.com.acgj.shotit.domain.User
+import br.com.acgj.shotit.infra.VideoCategoryTagRepository
 import br.com.acgj.shotit.infra.VideoRepository
 import org.springframework.stereotype.Service
 import java.util.*
@@ -10,22 +11,30 @@ data class VideoThumbnail(
     val url: String
 )
 
+data class VideoTags(val id: Long, val name: String)
+
 data class VideoDTO(
     val id: Long,
     val name: String,
     val url: String,
-    val thumbnails: List<VideoThumbnail>
+    val thumbnails: List<VideoThumbnail>,
+    val tags: List<VideoTags>
 )
 
 @Service
-class RetrieveVideoService(private val videoRepository: VideoRepository){
+class RetrieveVideoService(
+    private val videoRepository: VideoRepository,
+    private val tagsRepository: VideoCategoryTagRepository
+){
+
     fun retrieve(user: User): List<VideoDTO>? {
         return videoRepository.findByUser(user).map {
             VideoDTO(
                 id = it.id!!,
                 name = it.name,
                 url = it.url!!,
-            thumbnails = it.thumbnails?.map { thumbnail -> VideoThumbnail(thumbnail.id!!, thumbnail.url) } ?: emptyList()
+                thumbnails = it.thumbnails?.map { thumbnail -> VideoThumbnail(thumbnail.id!!, thumbnail.url) } ?: emptyList(),
+                tags = videoRepository.retrieveForVideo(it).map { tag -> VideoTags(tag.id!!, tag.name!!) }
             )
         }
     }
@@ -36,7 +45,8 @@ class RetrieveVideoService(private val videoRepository: VideoRepository){
                 id = it.id!!,
                 name = it.name,
                 url = it.url!!,
-                thumbnails = it.thumbnails?.map { thumbnail -> VideoThumbnail(thumbnail.id!!, thumbnail.url) } ?: emptyList()
+                thumbnails = it.thumbnails?.map { thumbnail -> VideoThumbnail(thumbnail.id!!, thumbnail.url) } ?: emptyList(),
+                tags = it.tags?.map { tag -> VideoTags(tag.id!!, tag.name!!) } ?: emptyList()
             )
         }
     }

@@ -23,8 +23,10 @@ data class User(
 
     var password: String,
 
+    var profilePicture: String? = null,
+
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val videos: MutableList<Video>? = null
+    val videos: MutableList<Video>? = null,
 )
 
 @Entity
@@ -41,6 +43,13 @@ data class Video(
 
     @OneToMany(mappedBy = "video", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, targetEntity = Thumbnail::class)
     var thumbnails: MutableList<Thumbnail>? = null,
+
+    @ManyToMany @JoinTable(
+        name = "video_tags",
+        joinColumns = [JoinColumn(name = "video_id")],
+        inverseJoinColumns = [JoinColumn(name = "tag_id")]
+    )
+    var tags: MutableList<VideoCategoryTag>?= null,
 
     @Enumerated(STRING)
     var status: VideoStatus = VideoStatus.PENDING,
@@ -67,8 +76,21 @@ data class Thumbnail(
     var principal: Boolean = false
 )
 
+@Entity
+@Table(name = "tags")
+data class VideoCategoryTag(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
+
+    @ManyToMany(mappedBy = "tags")
+    var video: MutableList<Video>? = null,
+
+    var name: String,
+)
+
 enum class VideoStatus {
     PENDING,
     SUCCESS,
     FAILED
 }
+

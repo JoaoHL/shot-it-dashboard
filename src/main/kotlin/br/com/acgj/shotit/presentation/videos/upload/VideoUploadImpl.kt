@@ -3,7 +3,7 @@ package br.com.acgj.shotit.presentation.videos.upload
 import br.com.acgj.shotit.application.UploadVideoService
 import br.com.acgj.shotit.domain.Video
 import br.com.acgj.shotit.infra.VideoRepository
-import br.com.acgj.shotit.infra.upload.UploadGateway
+import br.com.acgj.shotit.infra.upload.VideoUploadGateway
 import br.com.acgj.shotit.infra.upload.queue.UploadVideoProducer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +16,7 @@ import java.io.ByteArrayOutputStream
 @Service
 class VideoUploadImpl(
     private val repository: VideoRepository,
-    private val gateway: UploadGateway,
+    private val gateway: VideoUploadGateway,
     private val producer: UploadVideoProducer,
     private val logger: Logger = LoggerFactory.getLogger("VideoUploader")
 ) : UploadVideoService {
