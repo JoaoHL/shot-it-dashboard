@@ -1,6 +1,5 @@
 package br.com.acgj.shotit
 
-import br.com.acgj.shotit.domain.VideoCategoryTag
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import org.springframework.boot.CommandLineRunner
