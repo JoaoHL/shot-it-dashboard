@@ -30,6 +30,9 @@ interface VideoRepository : JpaRepository<Video, Long> {
     @Transactional
     @Query("UPDATE Video v SET v.name = :name WHERE v.id = :id AND v.user = :user")
     fun updateVideoTitle(name: String, id: Long, user: User): Int
+
+    @Query("FROM Video v JOIN FETCH v.user WHERE v.status = :status")
+    fun findAllByStatus(status: VideoStatus): MutableList<Video>
 }
 
 @Repository

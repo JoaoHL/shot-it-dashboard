@@ -35,3 +35,6 @@ aws:
   secretKey: "stack"
   region: "us-east-1"
   endpoint: "http://localhost:4566"
+
+  ses:
+    sender: "no-reply@shotit.com"

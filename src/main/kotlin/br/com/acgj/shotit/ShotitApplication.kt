@@ -5,11 +5,13 @@ import jakarta.transaction.Transactional
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 
 @SpringBootApplication
+@EnableScheduling
 class ShotitApplication(val manager: EntityManager) : WebMvcConfigurer, CommandLineRunner {
 
 	override fun addCorsMappings(registry: CorsRegistry) {

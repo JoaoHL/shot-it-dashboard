@@ -93,6 +93,7 @@ data class VideoCategoryTag(
 
 enum class VideoStatus {
     PENDING,
+    UPLOADED,
     SUCCESS,
     FAILED
 }

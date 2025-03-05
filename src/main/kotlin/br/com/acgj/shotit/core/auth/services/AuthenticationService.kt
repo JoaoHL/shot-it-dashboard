@@ -5,8 +5,8 @@ import br.com.acgj.shotit.core.domain.UserRepository
 import br.com.acgj.shotit.core.infra.auth.JWTService
 import br.com.acgj.shotit.core.infra.auth.UserDetailsImpl
 import br.com.acgj.shotit.core.auth.gateways.S3AvatarUploadGateway
-import br.com.acgj.shotit.presentation.authentication.SignInRequest
-import br.com.acgj.shotit.presentation.authentication.SignUpRequest
+import br.com.acgj.shotit.core.auth.ports.SignInRequest
+import br.com.acgj.shotit.core.auth.ports.SignUpRequest
 import jakarta.transaction.Transactional
 import kotlinx.coroutines.runBlocking
 import org.springframework.security.authentication.AuthenticationManager

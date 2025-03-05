@@ -14,10 +14,8 @@ class RetrieveVideoService(private val videoRepository: VideoRepository){
     fun retrieve(user: User): List<VideoDTO>? {
         return videoRepository.findByUser(user).map {
             VideoDTO(
-                id = it.id!!,
-                name = it.name,
-                thumbnails = it.thumbnails?.map { thumbnail -> VideoThumbnail(thumbnail.id!!, thumbnail.url) } ?: emptyList(),
-                tags = videoRepository.retrieveForVideo(it).map { tag -> VideoTags(tag.id!!, tag.name) }
+                video = it,
+                tags = videoRepository.retrieveForVideo(it)
             )
         }
     }
@@ -25,11 +23,8 @@ class RetrieveVideoService(private val videoRepository: VideoRepository){
     fun findById(id: Long): Optional<VideoDTO> {
         return videoRepository.eagerFindById(id).map {
             VideoDTO(
-                id = it.id!!,
-                name = it.name,
-                url = it.url!!,
-                thumbnails = it.thumbnails?.map { thumbnail -> VideoThumbnail(thumbnail.id!!, thumbnail.url) } ?: emptyList(),
-                tags = videoRepository.retrieveForVideo(it).map { tag -> VideoTags(tag.id!!, tag.name!!) }
+                video = it,
+                tags = videoRepository.retrieveForVideo(it)
             )
         }
     }

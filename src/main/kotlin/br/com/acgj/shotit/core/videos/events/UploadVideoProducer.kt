@@ -12,7 +12,7 @@ class UploadVideoProducer(private val template: RabbitTemplate){
         template.convertAndSend(
             RabbitMQVideoConfiguration.EXCHANGE_NAME,
             RabbitMQVideoConfiguration.UPLOAD_ROUTING_KEY,
-            UploadedVideoEvent(video.id!!, video.url!!, LocalDateTime.now().toString())
+            UploadedVideoEvent(video.id!!, video.name!!, LocalDateTime.now().toString())
         )
     }
 }

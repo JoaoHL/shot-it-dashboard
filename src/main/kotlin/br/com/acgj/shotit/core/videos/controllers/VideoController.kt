@@ -20,10 +20,7 @@ import org.springframework.web.bind.annotation.*
 class VideoController(
     private val applicationUser: ApplicationUser,
     private val retrieveVideoService: RetrieveVideoService,
-    private val videoRepository: VideoRepository,
-    private val uploadVideoService: UploadVideoService,
-    private val editVideoService: EditVideoService,
-    private val preSignGateway: S3VideoPreSignGateway
+    private val editVideoService: EditVideoService
 ){
 
     @GetMapping

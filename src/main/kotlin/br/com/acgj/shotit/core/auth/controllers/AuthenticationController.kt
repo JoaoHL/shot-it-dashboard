@@ -1,8 +1,8 @@
 package br.com.acgj.shotit.core.auth.controllers
 
+import br.com.acgj.shotit.core.auth.ports.SignInRequest
+import br.com.acgj.shotit.core.auth.ports.SignUpRequest
 import br.com.acgj.shotit.core.auth.services.AuthenticationService
-import br.com.acgj.shotit.presentation.authentication.SignInRequest
-import br.com.acgj.shotit.presentation.authentication.SignUpRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

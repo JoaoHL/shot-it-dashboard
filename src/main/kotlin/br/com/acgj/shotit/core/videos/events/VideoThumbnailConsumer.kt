@@ -1,8 +1,6 @@
 package br.com.acgj.shotit.core.videos.events
 
-import br.com.acgj.shotit.core.domain.Thumbnail
-import br.com.acgj.shotit.core.domain.ThumbnailRepository
-import br.com.acgj.shotit.core.domain.VideoRepository
+import br.com.acgj.shotit.core.domain.*
 import br.com.acgj.shotit.core.infra.messaging.RabbitMQVideoConfiguration
 import br.com.acgj.shotit.utils.parse
 import jakarta.transaction.Transactional
@@ -22,9 +20,11 @@ class VideoThumbnailConsumer(val videoRepository: VideoRepository, val thumbnail
 
     @Transactional
     fun handleAddThumbnails(message: UploadedThumbnailEvent){
-        val video = videoRepository.getReferenceById(message.video)
+        val video = videoRepository.findById(message.video).orElseThrow { NotFoundError() }
         val thumbnails = message.urls.map { Thumbnail(video = video, url = it ) }
+        video.status = VideoStatus.SUCCESS
         thumbnails.firstOrNull()?.principal = true
         thumbnailRepository.saveAll(thumbnails)
+        videoRepository.save(video)
     }
 }

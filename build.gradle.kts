@@ -29,6 +29,7 @@ dependencies {
 
 	implementation("com.rabbitmq:amqp-client:5.24.0")
 	implementation("aws.sdk.kotlin:s3:1.4.27")
+	implementation("aws.sdk.kotlin:ses:1.4.27")
 	implementation("com.auth0:java-jwt:4.5.0")
 
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
@@ -40,6 +41,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.security:spring-security-test")
+	testImplementation("io.mockk:mockk:1.13.17")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

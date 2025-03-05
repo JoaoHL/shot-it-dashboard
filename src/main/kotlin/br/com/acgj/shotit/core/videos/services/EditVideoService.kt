@@ -39,5 +39,4 @@ class EditVideoService(
         thumbnail.principal = true
         thumbnailRepository.save(thumbnail)
     }
-
 }

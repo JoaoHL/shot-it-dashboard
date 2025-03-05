@@ -39,3 +39,7 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### Python ###
+
+scripts/venv

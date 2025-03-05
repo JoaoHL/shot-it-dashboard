@@ -28,6 +28,4 @@ class SignVideoServiceImpl(
 
         return signs
     }
-
-
 }
