@@ -1,0 +1,44 @@
+# Banco de dados para desenvolvimento local
+# Em produção podemos utilizar um RDS, Aurora e afins
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: shotit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:latest
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shotit-secrets
+                  key: MYSQL_DB_PASSWORD
+            - name: MYSQL_DATABASE
+              value: shotit
+          ports:
+            - containerPort: 3306
+---
+# Serviço para a API Rest ter acesso ao banco
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: shotit
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306

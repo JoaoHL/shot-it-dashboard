@@ -1,0 +1,45 @@
+# Deploy da API Rest em Kotlin
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shotit-api
+  namespace: shotit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shotit-api
+  template:
+    metadata:
+      labels:
+        app: shotit-api
+    spec:
+      containers:
+        - name: shotit-api
+          image: shotit-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: shotit-secrets
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 1Gi
+
+---
+# Load Balancer para que a SPA consiga executar requisições para a API
+apiVersion: v1
+kind: Service
+metadata:
+  name: shotit-api
+  namespace: shotit
+spec:
+  selector:
+    app: shotit-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer

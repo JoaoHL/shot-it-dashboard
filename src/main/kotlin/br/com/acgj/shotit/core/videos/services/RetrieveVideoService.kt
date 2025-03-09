@@ -1,15 +1,18 @@
 package br.com.acgj.shotit.core.videos.services
 
+import br.com.acgj.shotit.core.domain.NotFoundError
 import br.com.acgj.shotit.core.domain.User
 import br.com.acgj.shotit.core.domain.VideoRepository
+import br.com.acgj.shotit.core.videos.gateways.ThumbnailDownloadGateway
 import br.com.acgj.shotit.core.videos.ports.VideoDTO
-import br.com.acgj.shotit.core.videos.ports.VideoThumbnail
-import br.com.acgj.shotit.core.videos.ports.VideoTags
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class RetrieveVideoService(private val videoRepository: VideoRepository){
+class RetrieveVideoService(
+    private val videoRepository: VideoRepository,
+    private val thumbnailDownloadGateway: ThumbnailDownloadGateway
+){
 
     fun retrieve(user: User): List<VideoDTO>? {
         return videoRepository.findByUser(user).map {
@@ -27,6 +30,11 @@ class RetrieveVideoService(private val videoRepository: VideoRepository){
                 tags = videoRepository.retrieveForVideo(it)
             )
         }
+    }
+
+    suspend fun downloadThumbnails(id: Long): ByteArray {
+        val video = videoRepository.eagerFindById(id).orElseThrow { NotFoundError("Video not found") }
+        return thumbnailDownloadGateway.retrieve(video.thumbnails!!)
     }
 
 }

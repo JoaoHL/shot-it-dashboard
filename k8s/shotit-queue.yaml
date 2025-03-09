@@ -1,0 +1,52 @@
+### Serviço de fila utilizando RabbitMQ e dashboard
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: shotit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:management
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+---
+# Serviço para o "shotit-processor" e "shotit-api" se comunicarem com a fila
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: shotit
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - protocol: TCP
+      port: 5672
+      targetPort: 5672
+---
+# Serviço para acessar a dashboard do RabbitMQ
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-dashboard
+  namespace: shotit
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - protocol: TCP
+      port: 15672
+      targetPort: 15672
+      nodePort: 31567  # Example port; Kubernetes will allocate if omitted
+  type: NodePort

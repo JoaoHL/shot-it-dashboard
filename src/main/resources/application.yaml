@@ -1,19 +1,18 @@
 spring:
   application:
     name: "ShotIt"
-
   servlet:
     multipart:
       max-file-size: "100MB"
       max-request-size: "100MB"
 
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${SPRING_QUEUE_HOST:localhost}
+    port: ${SPRING_QUEUE_PORT:5672}
+    username: ${SPRING_QUEUE_USERNAME:guest}
+    password: ${SPRING_QUEUE_PASSWORD:guest}
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/captureit?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&useSSL=false}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/shotit?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&useSSL=false}
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:verysecret}
   jpa:
@@ -25,16 +24,16 @@ spring:
         dialect: "org.hibernate.dialect.MySQL8Dialect"
 
 jwt:
-  secret: "S3CR3T"
+  secret: ${SPRING_JWT_SECRET:"S3CR3T"}
 
 storage:
   local: "storage/videos"
 
 aws:
-  accessKey: "local"
-  secretKey: "stack"
-  region: "us-east-1"
-  endpoint: "http://localhost:4566"
+  accessKey: ${SPRING_AWS_KEY:local}
+  secretKey: ${SPRING_AWS_SECRET:stack}
+  region: ${SPRING_AWS_REGION:us-east-1}
+  endpoint: ${SPRING_AWS_URL:http://localhost:4566}
 
   ses:
     sender: "no-reply@shotit.com"
