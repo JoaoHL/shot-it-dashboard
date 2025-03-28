@@ -42,6 +42,9 @@ dependencies {
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.security:spring-security-test")
 	testImplementation("io.mockk:mockk:1.13.17")
+	testImplementation("org.testcontainers:testcontainers:1.19.7")
+	testImplementation("org.testcontainers:localstack:1.19.7")
+	testImplementation("org.testcontainers:junit-jupiter:1.19.7")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
