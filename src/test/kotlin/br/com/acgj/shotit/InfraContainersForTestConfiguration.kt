@@ -28,7 +28,15 @@ open class InfraContainersForTestConfiguration {
 
         @Container
         private val localstack = LocalStackContainer(DockerImageName.parse("localstack/localstack:2.1"))
-            .withServices(LocalStackContainer.Service.S3)
+            .withServices(LocalStackContainer.Service.S3, LocalStackContainer.Service.SES)
+
+        fun verifyEmail() {
+            val command = "awslocal ses verify-email-identity --email no-reply@shotit.com"
+            val result = localstack.execInContainer(*command.split(" ").toTypedArray())
+            if (result.exitCode != 0) {
+                throw Exception(result.stderr)
+            }
+        }
 
         @JvmStatic
         @DynamicPropertySource
