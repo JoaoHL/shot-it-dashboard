@@ -5,8 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 
 @SpringBootTest
-@Import(InfraContainersForTestConfiguration::class)
-class ShotitApplicationTests {
+class ShotitApplicationTests  : InfraContainersForTestConfiguration(){
 
 	@Test
 	fun contextLoads() {
