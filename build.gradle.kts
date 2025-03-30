@@ -44,7 +44,10 @@ dependencies {
 	testImplementation("io.mockk:mockk:1.13.17")
 	testImplementation("org.testcontainers:testcontainers:1.19.7")
 	testImplementation("org.testcontainers:localstack:1.19.7")
-	testImplementation("org.testcontainers:junit-jupiter:1.19.7")
+	testImplementation("org.testcontainers:rabbitmq:1.19.3")
+	testImplementation("org.testcontainers:junit-jupiter:1.19.3")
+	testImplementation("org.testcontainers:mysql:1.19.3")
+	testImplementation("mysql:mysql-connector-java:8.0.33")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
