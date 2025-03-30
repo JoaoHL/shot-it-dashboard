@@ -4,6 +4,7 @@ plugins {
 	kotlin("plugin.jpa") version "2.1.10"
 	id("org.springframework.boot") version "3.4.2"
 	id("io.spring.dependency-management") version "1.1.7"
+	jacoco
 }
 
 group = "br.com.acgj"
@@ -65,4 +66,10 @@ allOpen {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+	reports {
+		csv.required.set(true)
+	}
 }
