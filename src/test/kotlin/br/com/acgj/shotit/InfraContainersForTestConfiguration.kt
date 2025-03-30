@@ -10,7 +10,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 
 @Testcontainers
-abstract class InfraContainersForTestConfiguration {
+class InfraContainersForTestConfiguration {
     companion object {
         @Container
         private val mysql = MySQLContainer("mysql:8.0")

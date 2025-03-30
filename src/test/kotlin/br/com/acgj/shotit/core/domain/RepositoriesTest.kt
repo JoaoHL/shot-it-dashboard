@@ -7,9 +7,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.context.annotation.Import
 
 @DataJpaTest
-class RepositoriesTest : InfraContainersForTestConfiguration() {
+@Import(InfraContainersForTestConfiguration::class)
+class RepositoriesTest{
 
     @Autowired
     private lateinit var videoRepository: VideoRepository
