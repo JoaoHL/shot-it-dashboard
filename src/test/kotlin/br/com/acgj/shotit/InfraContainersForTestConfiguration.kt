@@ -8,6 +8,7 @@ import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.utility.DockerImageName
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.Duration
 
 @Testcontainers
 open class InfraContainersForTestConfiguration {
@@ -25,6 +26,7 @@ open class InfraContainersForTestConfiguration {
             .withQueue("video.thumbnail")
             .withBinding("video.event", "video.processed", mapOf(), "video.upload", "topic")
             .withBinding("video.event", "video.thumbnail", mapOf(), "thumbnail.generated", "topic")
+            .withStartupTimeout(Duration.ofMinutes(3))
 
         @Container
         private val localstack = LocalStackContainer(DockerImageName.parse("localstack/localstack:2.1"))
