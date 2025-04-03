@@ -37,7 +37,7 @@ interface VideoRepository : JpaRepository<Video, Long> {
 
 @Repository
 interface ThumbnailRepository : JpaRepository<Thumbnail, Long> {
-    @Query("FROM Thumbnail t WHERE t.video = :video")
+    @Query("FROM Thumbnail t WHERE t.video = :video AND t.principal = true")
     fun findCurrentFavorite(video: Video): Optional<Thumbnail>
 }
 
