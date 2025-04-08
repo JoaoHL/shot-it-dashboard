@@ -10,7 +10,6 @@ import br.com.acgj.shotit.core.videos.ports.UpdateVideoTitleRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.groups.Tuple
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.util.Optional
 
@@ -16,8 +17,8 @@ interface UserRepository : JpaRepository<User, Long> {
 @Repository
 interface VideoRepository : JpaRepository<Video, Long> {
 
-    @Query("FROM Video v JOIN FETCH v.thumbnails WHERE v.id = :id")
-    fun eagerFindById(id: Long): Optional<Video>
+    @Query("FROM Video v LEFT JOIN FETCH v.thumbnails WHERE v.id = :id")
+    fun eagerFindById(@Param("id") id: Long): Optional<Video>
 
     @EntityGraph(attributePaths = ["thumbnails"])
     @Query("FROM Video v WHERE v.user = :user")
