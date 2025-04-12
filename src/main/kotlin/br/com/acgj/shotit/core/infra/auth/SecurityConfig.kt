@@ -25,6 +25,7 @@ class SecurityConfig(private val authenticationFilter: AuthenticationFilter) {
             .authorizeHttpRequests {
                 authorize -> authorize
                     .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/actuator/**").permitAll()
                     .requestMatchers(HttpMethod.OPTIONS).permitAll()
                     .anyRequest()
                     .authenticated()
