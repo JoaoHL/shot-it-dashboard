@@ -24,8 +24,7 @@ class EditVideoController(
 
     @PatchMapping("/{id}/change-name")
     fun handleChangeVideoName(@PathVariable("id") id: Long, @RequestBody request: UpdateVideoTitleRequest): ResponseEntity<Any> {
-        val user = applicationUser.fromContext()
-            ?: throw BadRequestError("Authentication Error", "unlogged_user", "User must be logged")
+        val user = applicationUser.fromContext()!!
 
         val updated = editVideoService.updateVideoTitle(user, id, request.title)
 

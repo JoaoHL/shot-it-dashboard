@@ -1,54 +1,89 @@
 package br.com.acgj.shotit.core.auth.services
 
+import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
+import aws.sdk.kotlin.services.s3.S3Client
+import aws.sdk.kotlin.services.s3.createBucket
+import aws.smithy.kotlin.runtime.auth.awscredentials.Credentials
+import aws.smithy.kotlin.runtime.net.url.Url
+import br.com.acgj.shotit.InfraContainersForTestConfiguration
+import br.com.acgj.shotit.LocalstackTestContainerConfiguration
 import br.com.acgj.shotit.core.auth.gateways.S3AvatarUploadGateway
 import br.com.acgj.shotit.core.auth.ports.SignInRequest
 import br.com.acgj.shotit.core.auth.ports.SignUpRequest
 import br.com.acgj.shotit.core.domain.BadRequestError
-import br.com.acgj.shotit.core.domain.User
 import br.com.acgj.shotit.core.domain.UserRepository
 import br.com.acgj.shotit.core.infra.auth.JWTService
-import br.com.acgj.shotit.core.infra.auth.UserDetailsImpl
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import br.com.acgj.shotit.core.infra.cloud.AwsConfiguration
 import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.core.AuthenticationException
 import org.springframework.security.crypto.password.PasswordEncoder
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import org.testcontainers.containers.localstack.LocalStackContainer
 
-class AuthenticationServiceTest {
+@SpringBootTest
+@Import(
+    InfraContainersForTestConfiguration::class,
+    AwsConfiguration::class,
+    JWTService::class
+)
+@AutoConfigureMockMvc
+class AuthenticationServiceTest : LocalstackTestContainerConfiguration() {
+
+    private lateinit var s3Client: S3Client
+    private lateinit var uploadGateway: S3AvatarUploadGateway
     private lateinit var authenticationService: AuthenticationService
-    private lateinit var manager: AuthenticationManager
+
+    @Autowired
     private lateinit var userRepository: UserRepository
-    private lateinit var uploadService: S3AvatarUploadGateway
+
+    @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
+
+    @Autowired
     private lateinit var jwtService: JWTService
+
+    @Autowired
+    private lateinit var manager: AuthenticationManager
 
     @BeforeEach
     fun setup() {
-        manager = mockk()
-        userRepository = mockk()
-        uploadService = mockk()
-        passwordEncoder = mockk()
-        jwtService = mockk()
-        authenticationService = AuthenticationService(
-            manager = manager,
-            userRepository = userRepository,
-            uploadService = uploadService,
-            passwordEncoder = passwordEncoder,
-            jwtService = jwtService
-        )
+        userRepository.deleteAll()
+        
+        s3Client = S3Client {
+            endpointUrl = Url.parse(localstack.getEndpointOverride(LocalStackContainer.Service.S3).toString())
+            region = localstack.region
+            credentialsProvider = StaticCredentialsProvider(
+                Credentials(
+                    accessKeyId = localstack.accessKey,
+                    secretAccessKey = localstack.secretKey
+                )
+            )
+        }
+
+        uploadGateway = S3AvatarUploadGateway(s3Client)
+        authenticationService = AuthenticationService(manager, userRepository, uploadGateway, passwordEncoder, jwtService)
+
+        runBlocking {
+            try {
+                s3Client.createBucket {
+                    bucket = "shotit"
+                }
+            } catch (e: Exception) {
+                // Bucket might already exist
+            }
+        }
     }
 
     @Test
-    fun `register should create user with profile picture`() {
-        // Arrange
+    fun `should create user with profile picture when registering`() {
         val request = SignUpRequest(
             username = "testuser",
             email = "test@example.com",
@@ -56,67 +91,46 @@ class AuthenticationServiceTest {
             name = "testuser",
             picture = MockMultipartFile("test.jpg", "files".toByteArray())
         )
-        val expectedUrl = "https://example.com/avatar.jpg"
-        val encodedPassword = "encodedPassword123"
 
-        every { passwordEncoder.encode(request.password) } returns encodedPassword
-        every { runBlocking { uploadService.upload(request.username, request.picture) }} returns expectedUrl
-        every { userRepository.save(any()) } returns mockk()
-
-        // Act
         authenticationService.register(request)
 
-        // Assert
-        verify { passwordEncoder.encode(request.password) }
-        verify { runBlocking {uploadService.upload(request.username, request.picture) }}
-        verify { 
-            userRepository.save(match { user ->
-                user.username == request.username &&
-                user.email == request.email &&
-                user.name == request.name &&
-                user.password == encodedPassword &&
-                user.profilePicture == expectedUrl
-            })
-        }
+        val savedUser = userRepository.findByEmail(request.email).get()
+        assertThat(savedUser.username).isEqualTo(request.username)
+        assertThat(savedUser.email).isEqualTo(request.email)
+        assertThat(savedUser.name).isEqualTo(request.name)
+        assertThat(passwordEncoder.matches(request.password, savedUser.password)).isTrue()
+        assertThat(savedUser.profilePicture).isNotNull()
     }
 
     @Test
-    fun `authenticate should return JWT token for valid credentials`() {
-        // Arrange
+    fun `should return JWT token when authenticating with valid credentials`() {
+        val user = SignUpRequest(
+            username = "testuser",
+            email = "test@example.com",
+            password = "password123",
+            name = "testuser",
+            picture = MockMultipartFile("test.jpg", "files".toByteArray())
+        )
+        authenticationService.register(user)
+
         val request = SignInRequest(
             email = "test@example.com",
             password = "password123"
         )
-        val user = mockk<User>()
-        val userDetails = UserDetailsImpl(user)
-        val expectedToken = "jwt.token.here"
 
-        every { manager.authenticate(any()) } returns mockk {
-            every { principal } returns userDetails
-        }
-        every { jwtService.generateToken(user) } returns expectedToken
+        val token = authenticationService.authenticate(request)
 
-        // Act
-        val result = authenticationService.authenticate(request)
-
-        // Assert
-        assertNotNull(result)
-        assertEquals(expectedToken, result)
-        verify { manager.authenticate(any()) }
-        verify { jwtService.generateToken(user) }
+        assertThat(token).isNotNull()
+        assertThat(jwtService.extractUserFromToken(token)).isEqualTo(user.email)
     }
 
     @Test
-    fun `authenticate should throw BadRequestError for invalid credentials`() {
-        // Arrange
+    fun `should throw BadRequestError when authenticating with invalid credentials`() {
         val request = SignInRequest(
             email = "test@example.com",
             password = "wrongpassword"
         )
 
-        every { manager.authenticate(any()) } throws mockk<AuthenticationException>()
-
-        // Act & Assert
         assertThrows<BadRequestError> {
             authenticationService.authenticate(request)
         }

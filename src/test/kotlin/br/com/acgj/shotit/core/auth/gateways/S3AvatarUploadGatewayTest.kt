@@ -3,7 +3,7 @@ package br.com.acgj.shotit.core.auth.gateways
 import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
 import aws.sdk.kotlin.services.s3.S3Client
 import aws.sdk.kotlin.services.s3.model.CreateBucketRequest
-import aws.sdk.kotlin.services.s3.model.GetObjectRequest
+import aws.sdk.kotlin.services.s3.model.NoSuchKey
 import aws.sdk.kotlin.services.s3.model.PutObjectRequest
 import aws.smithy.kotlin.runtime.auth.awscredentials.Credentials
 import aws.smithy.kotlin.runtime.content.asByteStream
@@ -17,8 +17,10 @@ import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
-import java.io.ByteArrayInputStream
+import java.io.InputStream
+import java.net.URL
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
 @Testcontainers
@@ -75,27 +77,49 @@ class S3AvatarUploadGatewayTest {
     }
 
     @Test
-    fun `retrieve should successfully download and zip thumbnails`() {
+    fun `upload should handle null content type`() {
         // Arrange
-        val thumbnail1Content = "thumbnail1 content".toByteArray()
-        val thumbnail2Content = "thumbnail2 content".toByteArray()
+        val username = "testuser"
+        val fileContent = "test image content".toByteArray()
+        val mockFile = MockMultipartFile(
+            "test.jpg",
+            "test.jpg",
+            null,
+            fileContent
+        )
+        val expectedUrl = "${localStack.getEndpointOverride(LocalStackContainer.Service.S3)}/shotit/testuser_test.jpg"
 
-        // Upload test thumbnails
-        runBlocking {
-            s3Client.putObject(PutObjectRequest {
-                bucket = "shotit"
-                key = "thumb1.png"
-                body = ByteArrayInputStream(thumbnail1Content).asByteStream()
-                contentType = "image/png"
-            })
+        // Act
+        val result = runBlocking { gateway.upload(username, mockFile) }
 
-            s3Client.putObject(PutObjectRequest {
-                bucket = "shotit"
-                key = "thumb2.png"
-                body = ByteArrayInputStream(thumbnail2Content).asByteStream()
-                contentType = "image/png"
-            })
-        }
+        // Assert
+        assertEquals(expectedUrl, result)
+    }
+
+    @Test
+    fun `upload should handle special characters in filename`() {
+        // Arrange
+        val username = "testuser"
+        val fileContent = "test image content".toByteArray()
+        val mockFile = MockMultipartFile(
+            "test image with spaces.jpg",
+            "test image with spaces.jpg",
+            "image/jpeg",
+            fileContent
+        )
+        val expectedUrl = "${localStack.getEndpointOverride(LocalStackContainer.Service.S3)}/shotit/testuser_test_image_with_spaces.jpg"
+
+        // Act
+        val result = runBlocking { gateway.upload(username, mockFile) }
+
+        // Assert
+        assertEquals(expectedUrl, result)
+    }
+
+    @Test
+    fun `retrieve should successfully download and zip thumbnails`() {
+        upload("thumb1.png")
+        upload("thumb2.png")
 
         val thumbnails = listOf(
             Thumbnail(id = 1, url = "${localStack.getEndpointOverride(LocalStackContainer.Service.S3)}/shotit/thumb1.png"),
@@ -121,5 +145,35 @@ class S3AvatarUploadGatewayTest {
         // Assert
         assertNotNull(result)
         assertEquals(0, result.size)
+    }
+
+    @Test
+    fun `retrieve should throw NoSuchKeyException when thumbnail does not exist`() {
+        // Arrange
+        val thumbnails = listOf(
+            Thumbnail(id = 1, url = "${localStack.getEndpointOverride(LocalStackContainer.Service.S3)}/shotit/non_existent.png")
+        )
+
+        // Act & Assert
+        assertFailsWith<NoSuchKey> {
+            runBlocking { gateway.retrieve(thumbnails) }
+        }
+    }
+
+    fun upload(path: String){
+        runBlocking {
+            val url = URL("https://assets.stickpng.com/images/587e31f49686194a55adab6e.png")
+            val connection = url.openConnection()
+            val inputStream: InputStream = connection.getInputStream()
+            s3Client.createBucket(CreateBucketRequest {
+                bucket = "shotit"
+            })
+            s3Client.putObject(PutObjectRequest {
+                bucket = "shotit"
+                key =  path
+                body = inputStream.asByteStream()
+                contentType = "image/png"
+            })
+        }
     }
 } 

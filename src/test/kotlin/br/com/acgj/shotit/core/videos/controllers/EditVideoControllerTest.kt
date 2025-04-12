@@ -86,6 +86,9 @@ class EditVideoControllerTest : LocalstackTestContainerConfiguration(){
         val thumbnails = mutableListOf(firstThumbnail, secondThumbnail)
         video.thumbnails = thumbnails
         videoRepository.save(video)
+    }
+
+    private fun autheticate() {
         val userDetails = UserDetailsImpl(user)
         val authentication = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
         val securityContext = SecurityContextImpl()
@@ -96,6 +99,7 @@ class EditVideoControllerTest : LocalstackTestContainerConfiguration(){
     @Test
     @Transactional
     fun `should update video title when user is authenticated`() {
+        autheticate()
         val request = UpdateVideoTitleRequest("New Video Title")
 
         mockMvc.perform(
@@ -111,6 +115,7 @@ class EditVideoControllerTest : LocalstackTestContainerConfiguration(){
     @Test
     @Transactional
     fun `should update video tags`() {
+        autheticate()
         val request = UpdateVideoTags(mutableListOf(tag.id!!,  newTag.id!!))
 
         mockMvc.perform(
@@ -127,6 +132,7 @@ class EditVideoControllerTest : LocalstackTestContainerConfiguration(){
     @Test
     @Transactional
     fun `should update favorite thumbnail`() {
+        autheticate()
         val request = UpdateThumbnailFavorite(secondThumbnail.id!!)
 
         mockMvc.perform(
@@ -138,5 +144,33 @@ class EditVideoControllerTest : LocalstackTestContainerConfiguration(){
         entityManager.flush()
         entityManager.refresh(secondThumbnail)
         assertThat(secondThumbnail.principal).isTrue()
+    }
+
+    @Test
+    @Transactional
+    fun `should throw bad request when user is not authenticated`() {
+        val request = UpdateVideoTitleRequest("New Video Title")
+
+        mockMvc.perform(
+            patch("/api/videos/${video.id}/change-name")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
+            .andExpect(status().`is`(403))
+    }
+
+    @Test
+    @Transactional
+    fun `should throw bad request when video is not found`() {
+        autheticate()
+        val request = UpdateVideoTitleRequest("New Video Title")
+        val nonExistentVideoId = 99999L
+
+        mockMvc.perform(
+            patch("/api/videos/$nonExistentVideoId/change-name")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
+            .andExpect(status().isBadRequest)
     }
 } 

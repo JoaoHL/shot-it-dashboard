@@ -56,17 +56,13 @@ class S3AvatarUploadGateway(private val client: S3Client) {
                 }
 
                 client.getObject(request) { response ->
-                    val content = response.body?.toByteArray() ?: ByteArray(0)
+                    val content = response.body!!.toByteArray()
                     val entry = ZipEntry("thumb_${thumbnail.id}.png")
                     zip.putNextEntry(entry)
                     zip.write(content)
                     zip.closeEntry()
                 }
             }
-        }
-
-        withContext(Dispatchers.IO) {
-            client.close()
         }
 
         return output.toByteArray()

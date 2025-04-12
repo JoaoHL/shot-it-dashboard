@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RestController
 class UserProfileController(private val applicationUser: ApplicationUser, private val gateway: S3AvatarUploadGateway) {
 
     @GetMapping
-    fun handleGetProfile(): ResponseEntity<UserProfileDTO> = applicationUser
-        .fromContext()
-        ?.let { ResponseEntity.ok(UserProfileDTO(it)) }
-        ?: ResponseEntity.notFound().build();
+    fun handleGetProfile(): ResponseEntity<UserProfileDTO> {
+        val fromContext = applicationUser
+            .fromContext()
+        return   ResponseEntity.ok(UserProfileDTO(fromContext!!))
+    }
 }

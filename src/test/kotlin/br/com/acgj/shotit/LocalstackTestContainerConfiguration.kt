@@ -12,8 +12,8 @@ open class LocalstackTestContainerConfiguration {
 
     companion object {
         @Container
-        private val localstack = LocalStackContainer(DockerImageName.parse("localstack/localstack:2.1"))
-            .withServices(LocalStackContainer.Service.S3, LocalStackContainer.Service.SES)
+        val localstack = LocalStackContainer(DockerImageName.parse("localstack/localstack:2.1"))
+            .withServices(LocalStackContainer.Service.S3)
 
         @JvmStatic
         @DynamicPropertySource
@@ -23,6 +23,7 @@ open class LocalstackTestContainerConfiguration {
             registry.add("aws.region") { localstack.region }
             registry.add("aws.credentials.access-key") { localstack.accessKey }
             registry.add("aws.credentials.secret-key") { localstack.secretKey }
+            localstack.start()
         }
 
         @JvmStatic

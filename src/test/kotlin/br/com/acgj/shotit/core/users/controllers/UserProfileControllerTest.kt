@@ -70,4 +70,10 @@ class UserProfileControllerTest : LocalstackTestContainerConfiguration() {
             .andExpect(jsonPath("$.name").value("Test User"))
             .andExpect(jsonPath("$.profilePicture").value("https://example.com/avatar.jpg"))
     }
+
+    @Test
+    fun `should return 403 when user is not logged`() {
+        mockMvc.perform(get("/api/profile"))
+            .andExpect(status().`is`(403))
+    }
 } 
