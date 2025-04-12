@@ -10,7 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.context.annotation.Import
 
 @DataJpaTest
-class RepositoriesTest : InfraContainersForTestConfiguration(){
+@Import(InfraContainersForTestConfiguration::class)
+class RepositoriesTest{
 
     @Autowired
     private lateinit var videoRepository: VideoRepository

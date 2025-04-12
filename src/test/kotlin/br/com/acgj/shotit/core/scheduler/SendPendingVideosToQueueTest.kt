@@ -1,6 +1,7 @@
 package br.com.acgj.shotit.core.scheduler
 
 import br.com.acgj.shotit.InfraContainersForTestConfiguration
+import br.com.acgj.shotit.LocalstackTestContainerConfiguration
 import br.com.acgj.shotit.core.domain.User
 import br.com.acgj.shotit.core.domain.UserRepository
 import br.com.acgj.shotit.core.domain.Video
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
 import kotlin.test.assertEquals
@@ -17,8 +19,9 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 @SpringBootTest
+@Import(InfraContainersForTestConfiguration::class)
 @ActiveProfiles("test")
-class SendPendingVideosToQueueTest : InfraContainersForTestConfiguration() {
+class SendPendingVideosToQueueTest  : LocalstackTestContainerConfiguration(){
 
     @Autowired
     private lateinit var sendPendingVideosToQueue: SendPendingVideosToQueue

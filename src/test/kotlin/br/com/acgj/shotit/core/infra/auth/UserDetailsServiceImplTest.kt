@@ -1,6 +1,7 @@
 package br.com.acgj.shotit.core.infra.auth
 
 import br.com.acgj.shotit.InfraContainersForTestConfiguration
+import br.com.acgj.shotit.LocalstackTestContainerConfiguration
 import br.com.acgj.shotit.core.domain.User
 import br.com.acgj.shotit.core.domain.UserRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -12,8 +13,8 @@ import org.springframework.context.annotation.Import
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 
 @DataJpaTest
-@Import(UserDetailsServiceImpl::class)
-class UserDetailsServiceImplTest  : InfraContainersForTestConfiguration(){
+@Import(UserDetailsServiceImpl::class, InfraContainersForTestConfiguration::class)
+class UserDetailsServiceImplTest : LocalstackTestContainerConfiguration(){
 
     @Autowired
     private lateinit var userDetailsService: UserDetailsServiceImpl

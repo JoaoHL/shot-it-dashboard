@@ -1,6 +1,7 @@
 package br.com.acgj.shotit.core.videos.controllers
 
 import br.com.acgj.shotit.InfraContainersForTestConfiguration
+import br.com.acgj.shotit.LocalstackTestContainerConfiguration
 import br.com.acgj.shotit.core.domain.*
 import br.com.acgj.shotit.core.infra.auth.ApplicationUser
 import br.com.acgj.shotit.core.infra.auth.UserDetailsImpl
@@ -27,8 +28,8 @@ import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(ApplicationUser::class)
-class EditVideoControllerTest : InfraContainersForTestConfiguration() {
+@Import(ApplicationUser::class, InfraContainersForTestConfiguration::class)
+class EditVideoControllerTest : LocalstackTestContainerConfiguration(){
 
     @Autowired
     private lateinit var mockMvc: MockMvc

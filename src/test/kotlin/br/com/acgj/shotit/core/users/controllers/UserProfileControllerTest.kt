@@ -1,6 +1,7 @@
 package br.com.acgj.shotit.core.users.controllers
 
 import br.com.acgj.shotit.InfraContainersForTestConfiguration
+import br.com.acgj.shotit.LocalstackTestContainerConfiguration
 import br.com.acgj.shotit.core.auth.gateways.S3AvatarUploadGateway
 import br.com.acgj.shotit.core.domain.User
 import br.com.acgj.shotit.core.domain.UserRepository
@@ -25,8 +26,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(ApplicationUser::class)
-class UserProfileControllerTest : InfraContainersForTestConfiguration() {
+@Import(ApplicationUser::class, InfraContainersForTestConfiguration::class)
+class UserProfileControllerTest : LocalstackTestContainerConfiguration() {
 
     @Autowired
     private lateinit var mockMvc: MockMvc

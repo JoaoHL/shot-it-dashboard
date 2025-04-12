@@ -5,9 +5,11 @@ import aws.sdk.kotlin.services.s3.model.CreateBucketRequest
 import aws.sdk.kotlin.services.s3.model.PutObjectRequest
 import aws.smithy.kotlin.runtime.content.asByteStream
 import br.com.acgj.shotit.InfraContainersForTestConfiguration
+import br.com.acgj.shotit.LocalstackTestContainerConfiguration
 import br.com.acgj.shotit.core.domain.*
 import br.com.acgj.shotit.core.infra.auth.ApplicationUser
 import br.com.acgj.shotit.core.infra.auth.UserDetailsImpl
+import br.com.acgj.shotit.core.infra.cloud.AwsConfiguration
 import br.com.acgj.shotit.core.videos.gateways.S3ThumbnailGateway
 import br.com.acgj.shotit.core.videos.services.RetrieveVideoService
 import jakarta.persistence.EntityManager
@@ -33,8 +35,8 @@ import java.net.URL
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(ApplicationUser::class )
-class VideoControllerTest : InfraContainersForTestConfiguration() {
+@Import(ApplicationUser::class, AwsConfiguration::class, InfraContainersForTestConfiguration::class )
+class VideoControllerTest : LocalstackTestContainerConfiguration() {
 
 
 

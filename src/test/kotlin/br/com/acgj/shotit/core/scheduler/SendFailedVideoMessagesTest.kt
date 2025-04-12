@@ -1,8 +1,9 @@
 package br.com.acgj.shotit.core.scheduler
 
 import aws.sdk.kotlin.services.ses.SesClient
-import aws.sdk.kotlin.services.ses.model.SendEmailRequest
+import aws.sdk.kotlin.services.ses.model.VerifyEmailAddressRequest
 import br.com.acgj.shotit.InfraContainersForTestConfiguration
+import br.com.acgj.shotit.LocalstackTestContainerConfiguration
 import br.com.acgj.shotit.core.domain.*
 import br.com.acgj.shotit.core.infra.cloud.AwsConfiguration
 import br.com.acgj.shotit.core.infra.mailer.AWSMailer
@@ -14,19 +15,12 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
 
-import java.time.LocalDateTime
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-
 @DataJpaTest
-@Import(AWSMailer::class, SendFailedVideoMessages::class, AwsConfiguration::class)
-class SendFailedVideoMessagesTest : InfraContainersForTestConfiguration() {
+@Import(AWSMailer::class, SendFailedVideoMessages::class, AwsConfiguration::class, InfraContainersForTestConfiguration::class)
+class SendFailedVideoMessagesTest: LocalstackTestContainerConfiguration() {
 
 
     private lateinit var sendFailedVideoMessages: SendFailedVideoMessages
@@ -48,7 +42,14 @@ class SendFailedVideoMessagesTest : InfraContainersForTestConfiguration() {
 
     @BeforeEach
     fun setup() {
-        verifyEmail()
+        // verifing email no-reply@shotit.com
+        runBlocking {
+            sesClient.verifyEmailAddress(
+                VerifyEmailAddressRequest {
+                    emailAddress = "no-reply@shotit.com"
+                }
+            )
+        }
         sendFailedVideoMessages = SendFailedVideoMessages(spy(mailer), videoRepository)
     }
 
