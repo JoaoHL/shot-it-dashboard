@@ -112,6 +112,22 @@ docker-compose ps
 - **Aplicação**
   - URL: http://localhost:8080
 
+### Documentação da API
+
+A documentação da API está disponível através do Swagger UI e pode ser acessada nos seguintes endpoints:
+
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
+- **OpenAPI JSON**: http://localhost:8080/v3/api-docs
+
+A documentação está organizada nas seguintes seções:
+
+- **Autenticação**: APIs de gerenciamento de autenticação
+- **Vídeos**: APIs de gerenciamento e recuperação de vídeos
+- **Tags**: APIs de gerenciamento de tags de vídeos
+- **Upload de Vídeos**: APIs de upload e processamento de vídeos
+- **Perfil do Usuário**: APIs de gerenciamento de perfil do usuário
+- **Edição de Vídeos**: APIs de edição e gerenciamento de vídeos
+
 ### Parando os Serviços
 
 Para parar todos os serviços:
