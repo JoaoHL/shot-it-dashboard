@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: shotit-api
-          image: shotit-api:latest
+          image: DOCKER_IMAGE
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
